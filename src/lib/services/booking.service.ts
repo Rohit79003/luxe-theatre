@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CreateBookingInput } from "@/lib/validations/booking";
 import { validateCoupon } from "@/lib/services/coupon.service";
-import { SlotStatus, Prisma } from "@/generated/prisma";
+import { SlotStatus, Prisma } from "@prisma/client";
 
 export interface BookingResult {
   id: number;

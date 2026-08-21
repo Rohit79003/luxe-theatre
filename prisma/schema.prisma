@@ -1,8 +1,7 @@
 // This is your Prisma schema file for Luxe Screens
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {

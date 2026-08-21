@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { AddOnCategory } from "@/generated/prisma";
+import { AddOnCategory } from "@prisma/client";
 
 export async function getAddOns(category?: string) {
   const where: any = {};

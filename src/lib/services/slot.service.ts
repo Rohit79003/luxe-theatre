@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { SlotStatus } from "@/generated/prisma";
+import { SlotStatus } from "@prisma/client";
 
 export interface SlotAvailabilityResult {
   id: number;
