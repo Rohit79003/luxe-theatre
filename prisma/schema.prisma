@@ -1,0 +1,110 @@
+// This is your Prisma schema file for Luxe Screens
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BLOCKED
+}
+
+enum AddOnCategory {
+  CAKE
+  DECOR
+  GIFT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model Theater {
+  id          Int       @id @default(autoincrement())
+  name        String
+  basePrice   Decimal   @db.Decimal(10, 2)
+  maxCapacity Int
+  screen      String
+  sound       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  slots       Slot[]
+  bookings    Booking[]
+}
+
+model Slot {
+  id        Int        @id @default(autoincrement())
+  time      String     // E.g., "10:00 AM - 01:00 PM"
+  status    SlotStatus @default(AVAILABLE) // General slot status (AVAILABLE / BLOCKED)
+  theaterId Int
+  theater   Theater    @relation(fields: [theaterId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  bookings  Booking[]
+}
+
+model AddOn {
+  id        Int           @id @default(autoincrement())
+  name      String
+  category  AddOnCategory
+  price     Decimal       @db.Decimal(10, 2)
+  options   Json?         // E.g., options like flavor list, theme variants, package details
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  cartItems CartItem[]
+}
+
+model Booking {
+  id            Int           @id @default(autoincrement())
+  location      String
+  date          DateTime      @db.Date
+  guests        Int
+  name          String
+  phone         String
+  email         String
+  occasion      String
+  total         Decimal       @db.Decimal(10, 2)
+  paymentStatus PaymentStatus @default(PENDING)
+  theaterId     Int
+  theater       Theater       @relation(fields: [theaterId], references: [id])
+  slotId        Int
+  slot          Slot          @relation(fields: [slotId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  cartItems     CartItem[]
+
+  @@unique([theaterId, slotId, date], name: "unique_theater_slot_date")
+}
+
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  bookingId  Int
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  addOnId    Int
+  addOn      AddOn    @relation(fields: [addOnId], references: [id])
+  optionName String
+  price      Decimal  @db.Decimal(10, 2) // Price snapshot at booking creation time
+  quantity   Int      @default(1)
+  createdAt  DateTime @default(now())
+}
+
+model Waitlist {
+  id                Int      @id @default(autoincrement())
+  name              String
+  email             String
+  phone             String
+  preferredLocation String
+  notes             String?
+  createdAt         DateTime @default(now())
+}
